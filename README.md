@@ -61,9 +61,9 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou um 
 
 ## Autores
 
-- Giovana C. Lopes(https://github.com/usuario2)
+- Giovana C. Lopes(https://github.com/SraAmontillado)
 - Marcelo K. Shioya Jr.(https://github.com/markazushi)
-- Gustavo M. M. Soares(https://github.com/usuario3)
+- Gustavo M. M. Soares(https://github.com/MoratoZ)
 
 ## Agradecimentos
 
@@ -72,4 +72,3 @@ Agradecemos ao Instituto Federal de São Paulo (IFSP) e ao Prof. Doc. Andryos da
 ---
 
 Feito com ❤️ por alunos do PEP-IFSP.
-```
