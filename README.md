@@ -61,9 +61,9 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou um 
 
 ## Autores
 
-- Giovana C. Lopes(https://github.com/SraAmontillado)
-- Marcelo K. Shioya Jr.(https://github.com/markazushi)
-- Gustavo M. M. Soares(https://github.com/MoratoZ)
+- [Giovana C. Lopes](https://github.com/SraAmontillado)
+- [Marcelo K. Shioya Jr.](https://github.com/markazushi)
+- [Gustavo M. M. Soares](https://github.com/MoratoZ)
 
 ## Agradecimentos
 
