@@ -1,6 +1,6 @@
 # Projeto-microondas-PEP-IFSP
 
-Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP - Instituto Federal de Ciencias e Tecnologia de São Paulo Campus PEP - Presidente Epitacio e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas PyQt6, NumPy e Matplotlib para a interface gráfica e visualização de dados.
+Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP - Instituto Federal de Ciencias e Tecnologia de São Paulo Campus PEP - Presidente Epitacio e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas PyQt6 e Matplotlib para a interface gráfica e visualização de dados.
 
 ## Funcionalidades
 
@@ -36,7 +36,7 @@ pip install PyQt6 matplotlib NumPy
 1. Execute o script principal para iniciar a aplicação:
 
 ```bash
-python main.py
+python Main.py
 ```
 
 2. Insira os valores necessários nos campos de entrada:
