@@ -52,7 +52,7 @@ python Main.py
 
 ## Estrutura do Código
 
-- `main.py`: Arquivo principal que contém a lógica da aplicação.
+- `Main.py`: Arquivo principal que contém a lógica da aplicação.
 - `Janela`: Classe principal que define a interface gráfica e realiza os cálculos e plotagens.
 
 ## Contribuição
@@ -67,7 +67,7 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou um 
 
 ## Agradecimentos
 
-Agradecemos ao Instituto Federal de São Paulo (IFSP) e ao Prof. Doc. Andryos da Silva Lemes pelo suporte e orientação no desenvolvimento deste projeto.
+Agradecemos ao Instituto Federal de São Paulo (IFSP) e ao Prof. Dr. Andryos da Silva Lemes pelo suporte e orientação no desenvolvimento deste projeto.
 
 ---
 
