@@ -1,8 +1,6 @@
 # Projeto-microondas-PEP-IFSP
 
-# Projeto de Cálculo de Micro-ondas
-
-Este projeto foi desenvolvido por alunos do PEP-IFSP e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas PyQt6 e Matplotlib para a interface gráfica e visualização de dados.
+Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP - Instituto Federal de Ciencias e Tecnologia de São Paulo Campus PEP - Presidente Epitacio e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas PyQt6, NumPy e Matplotlib para a interface gráfica e visualização de dados.
 
 ## Funcionalidades
 
@@ -24,13 +22,13 @@ Clone este repositório para sua máquina local:
 
 ```bash
 git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+cd Projeto-microondas-PEP-IFSP
 ```
 
 Instale os pacotes necessários:
 
 ```bash
-pip install -r requirements.txt
+pip install PyQt6 matplotlib NumPy
 ```
 
 ## Como usar
@@ -61,28 +59,17 @@ python main.py
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou um pull request.
 
-## Licença
-
-Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
 ## Autores
 
-- [Nome do Aluno 1](https://github.com/usuario1)
-- [Nome do Aluno 2](https://github.com/usuario2)
-- [Nome do Aluno 3](https://github.com/usuario3)
+- Giovana C. Lopes(https://github.com/usuario2)
+- Marcelo K. Shioya Jr.(https://github.com/markazushi)
+- Gustavo M. M. Soares(https://github.com/usuario3)
 
 ## Agradecimentos
 
-Agradecemos ao Instituto Federal de São Paulo (IFSP) pelo suporte e orientação no desenvolvimento deste projeto.
+Agradecemos ao Instituto Federal de São Paulo (IFSP) e ao Prof. Doc. Andryos da Silva Lemes pelo suporte e orientação no desenvolvimento deste projeto.
 
 ---
 
 Feito com ❤️ por alunos do PEP-IFSP.
 ```
-
-### Notas
-
-- Substitua `https://github.com/seu-usuario/seu-repositorio.git` pelo link real do seu repositório no GitHub.
-- Adicione os nomes e links para os perfis do GitHub dos autores do projeto.
-- Se necessário, crie um arquivo `requirements.txt` listando as dependências (`PyQt6`, `Matplotlib`, `NumPy`).
-- Verifique se a licença MIT é a desejada e, se necessário, adicione ou modifique conforme apropriado.
