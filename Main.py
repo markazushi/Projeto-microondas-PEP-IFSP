@@ -24,7 +24,7 @@ class Janela(QMainWindow):
         self.centralwidget.setObjectName("centralwidget")
 
         self.widget1 = QtWidgets.QWidget(self.centralwidget)
-        self.widget1.setGeometry(QtCore.QRect(575, 50, 1225, 110))
+        self.widget1.setGeometry(QtCore.QRect(250, 50, 1300, 110))
         self.widget1.setObjectName("widget1")
 
         # Layout de grade
@@ -78,14 +78,14 @@ class Janela(QMainWindow):
             ("label_2", "Tensão sobre a carga (V):"),
             ("label_5", "Impedância da carga (ohms):"),
             ("label_7", "Frequência (Hz):"),
-            ("label_omega", "Omega:"),
-            ("label_beta", "Beta:"),
-            ("label_lg", "Lambda_g:"),
-            ("label_vp", "Velocidade de fase (vp):"),
-            ("label_vg", "Velocidade de grupo (vg):"),
-            ("label_gamma_L", "Gamma_L:"),
-            ("label_tao", "tao:"),
-            ("label_SWR", "SWR:")
+            ("label_omega", "Omega (rad/s):"),
+            ("label_beta", "Beta (V):"),
+            ("label_lg", "Comp. de onda (m):"),
+            ("label_vp", "Vel. de propagação (m/s):"),
+            ("label_vg", "Vel. de grupo (m/s):"),
+            ("label_gamma_L", "Coef. de reflexão:"),
+            ("label_tao", "Coef. de refração:"),
+            ("label_SWR", "Coef. SWR:")
         ]
 
         positions = [(0, 0), (0, 1), (0, 2), (0, 3), (2, 0), (2, 1), (2, 2), (0, 5), (0, 6), (0, 7), (0, 8), (2, 5), (2, 6), (2, 7), (2, 8)]
