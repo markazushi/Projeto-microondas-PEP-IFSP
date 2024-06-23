@@ -7,13 +7,14 @@ Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia E
 - Entrada de parâmetros elétricos e físicos da linha de transmissão.
 - Cálculo de diversos parâmetros de ondas, como impedância, tensão, velocidade de fase e grupo, entre outros.
 - Plotagem de gráficos representando a parte real, imaginária e módulo da impedância ao longo da linha.
-- Visualização de gráficos das ondas de tensão e corrente ao longo da linha de transmissão.
+- Visualização de gráficos interativos das ondas de tensão e corrente ao longo da linha de transmissão.
 
 ## Requisitos
 
 - Python 3.6 ou superior
 - PyQt6
 - Matplotlib
+- Mplcursors
 - NumPy
 
 ## Instalação
@@ -28,7 +29,7 @@ cd Projeto-microondas-PEP-IFSP
 Instale os pacotes necessários:
 
 ```bash
-pip install PyQt6 matplotlib NumPy
+pip install PyQt6 matplotlib NumPy mplcursors
 ```
 
 ## Como usar
