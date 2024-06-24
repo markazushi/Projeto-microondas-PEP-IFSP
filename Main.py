@@ -171,8 +171,8 @@ class Janela(QMainWindow):
             # Recupera os valores dos campos de entrada
             d = float(self.line_edits["res_d"].text())
             zo = float(self.line_edits["res_zo"].text())
-            C = float(self.line_edits["res_C"].text()) * d
-            L = float(self.line_edits["res_L"].text()) * d
+            C = float(self.line_edits["res_C"].text())
+            L = float(self.line_edits["res_L"].text())
             f = float(self.line_edits["res_f"].text())
             zl = complex(float(self.line_edits["prt_real"].text()), float(self.line_edits["prt_imag"].text()))
             vi = float(self.line_edits["res_vi"].text())
