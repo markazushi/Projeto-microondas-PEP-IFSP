@@ -36,7 +36,7 @@ pip install customtkinter matplotlib NumPy
 1. Execute o script principal para iniciar a aplicação:
 
 ```bash
-python Ondas_TF.py
+python Main.py
 ```
 
 2. Insira os valores necessários nos campos de entrada:
@@ -54,7 +54,7 @@ python Ondas_TF.py
 
 ## Estrutura do Código
 
-- `Ondas_TF.py`: Arquivo principal que contém a lógica da aplicação.
+- `Main.py`: Arquivo principal que contém a lógica da aplicação.
 - `Prog`: Classe principal que define a interface gráfica e realiza os cálculos e plotagens.
 
 ## Contribuição
