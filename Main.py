@@ -1,310 +1,582 @@
-import os
-import sys
-import mplcursors
-import matplotlib
+import customtkinter as ctk
 import numpy as np
-matplotlib.use('QtAgg')
-os.environ['QT_API'] = 'PyQt6'
 import matplotlib.pyplot as plt
-from PyQt6 import QtCore, QtWidgets
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QErrorMessage, QWidget, QTabWidget
 
-class Janela(QMainWindow):
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+class Prog(ctk.CTk):
+
+    # inicialização #
+
     def __init__(self):
         super().__init__()
-        self.setup()
-
-    def setup(self):
-        # Configura a janela principal
-        self.setObjectName("MainWindow")
-        self.showMaximized()  # Janela em fullscreen
-
-        # Widget central
-        self.centralwidget = QtWidgets.QWidget(self)
-        self.centralwidget.setObjectName("centralwidget")
-
-        self.widget1 = QtWidgets.QWidget(self.centralwidget)
-        self.widget1.setGeometry(QtCore.QRect(60, 40, 1780, 150))
-        self.widget1.setObjectName("widget1")
-
-        # Layout de grade
-        self.gridLayout = QtWidgets.QGridLayout(self.widget1)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout.setObjectName("gridLayout")
-
-        # Adiciona e nomeia os objetos
-        self.add_labels()
-        self.add_line_edits()
-        self.add_button()
-
-        # Área do gráfico com abas
-        self.tab_widget = QTabWidget(self.centralwidget)
-        self.tab_widget.setGeometry(QtCore.QRect(50, 200, 1800, 800))
-        self.tab_widget.setObjectName("tab_widget")
-
-        self.graph_widgets = []
-        self.figures = []
-        self.canvases = []
-
-        nome_graf = ["Parte real da impedancia ao longo da linha",
-                     "Parte imaginaria da impedancia ao longo da linha",
-                     "Modulo da impedancia ao longo da linha",
-                     "Tensão ao longo da linha",
-                     "Corrente ao longo da linha",
-                     ]
-
-        for i in range(5):
-            graph_widget = QWidget()
-            graph_layout = QVBoxLayout(graph_widget)
-            figure = Figure()
-            canvas = FigureCanvas(figure)
-            toolbar = NavigationToolbar(canvas, graph_widget)
-            graph_layout.addWidget(toolbar)
-            graph_layout.addWidget(canvas)
-            self.tab_widget.addTab(graph_widget, nome_graf[i])
-            self.graph_widgets.append(graph_widget)
-            self.figures.append(figure)
-            self.canvases.append(canvas)
-
-        # Define o widget central e a barra de menu
-        self.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1119, 26))
-        self.menubar.setObjectName("menubar")
-        self.setMenuBar(self.menubar)
+    
+        # cabeçalho #
         
-        # Barra de status
-        self.statusbar = QtWidgets.QStatusBar(self)
-        self.statusbar.setObjectName("statusbar")
-        self.setStatusBar(self.statusbar)
+        dimx = (self.winfo_screenwidth()-450)
+        dimy = (self.winfo_screenheight()-150)
 
-        # Inicializa os labels dos resultados como None
-        self.result_labels = [None] * 8
+        self.input_title = ctk.CTkLabel(self, text="\n - Dados iniciais - ", width=200, font=('Arial Narrow bold', 20))
+        self.input_title.grid(row=0, column=0, columnspan=2, pady=0, padx=10)
 
-        # Tradução da interface do usuário
-        self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self)
+        self.graphs_title = ctk.CTkLabel(self, text="\n - Gráficos gerados - ", width=dimx, font=('Arial Narrow bold', 20))
+        self.graphs_title.grid(row=0, column=2, pady=0, padx=10)
 
-    def add_labels(self):
-        # Adiciona os labels ao layout
-        labels_text = [
-            ("per_d", "Distância (m):"),
-            ("per_zo", "Impedância do cabo (ohms):"),
-            ("per_C", "Capacitância do cabo (F/m):"),
-            ("per_L", "Indutância do cabo (H/m):"),
-            ("per_f", "Frequência (Hz):"),
-            ("per_zl", "Impedância da carga (ohms):"),
-            ("per_vi", "Tensão sobre a carga (V):"),
-            ("per_pts", "Numero de pontos (padrão 1000):"),
-            ("label_omega", "Omega (rad/s):"),
-            ("label_beta", "Beta (rad/m):"),
-            ("label_lg", "Comp. de onda (m):"),
-            ("label_vp", "Vel. de propagação (m/s):"),
-            ("label_vg", "Vel. de grupo (m/s):"),
-            ("label_gamma_L", "Coef. de reflexão (ads):"),
-            ("label_tao", "Coef. de refração (ads):"),
-            ("label_SWR", "Coef. SWR (ads):")
-        ]
+        self.output_title = ctk.CTkLabel(self, text="\n - Resultados - ", width=200, font=('Arial Narrow bold', 20))
+        self.output_title.grid(row=0, column=3, pady=0, padx=10)
 
-        positions = [
-            (0, 0), (0, 3), (0, 6), (0, 9), (2, 0), (2, 3), (2, 6), (2, 9),
-            (0, 12), (0, 15), (0, 18), (0, 21), (2, 12), (2, 15), (2, 18), (2, 21)
-        ]
+        # espaço para os gráficos #
+
+        self.graphs_box = ctk.CTkTabview(self, width=dimx, height=dimy, fg_color="#fff")
+        self.graphs_box.place(x=230, y=50)
+
+        self.graphs_box.add("Visão Geral")
+        self.graphs_box.tab("Visão Geral").grid(row=0, column=1, pady=5, padx=20)
+
+        self.graphs_box.add("Parte real da impedância")
+        self.graphs_box.tab("Parte real da impedância").grid(row=0, column=2, pady=5, padx=20)
         
-        for (name, text), pos in zip(labels_text, positions):
-            label = QtWidgets.QLabel(self.widget1)
-            label.setObjectName(name)
-            label.setText(text)
-            self.gridLayout.addWidget(label, *pos, 1, 3)
-
-    def add_line_edits(self):
-    # Adiciona os campos de entrada ao layout
-        self.line_edits = {}
-        line_edits_names = ["res_d", "res_zo", "res_C", "res_L", "res_f", "res_vi", "res_pts"]
-        positions = [(1, 0), (1, 3), (1, 6), (1, 9), (3, 0), (3, 6), (3, 9)]
-
-        for name, pos in zip(line_edits_names, positions):
-            line_edit = QtWidgets.QLineEdit(self.widget1)
-            line_edit.setObjectName(name)
-            self.gridLayout.addWidget(line_edit, *pos, 1, 3)
-            self.line_edits[name] = line_edit
-
-        # Ajuste os campos de entrada para a impedância da carga
-        impedance_layout = QtWidgets.QHBoxLayout()
+        self.graphs_box.add("Parte imaginária da impedância")
+        self.graphs_box.tab("Parte imaginária da impedância").grid(row=0, column=3, pady=5, padx=20)
         
-        line_edit_real = QtWidgets.QLineEdit(self.widget1)
-        line_edit_real.setObjectName("prt_real")
-        impedance_layout.addWidget(line_edit_real)
-        self.line_edits["prt_real"] = line_edit_real
+        self.graphs_box.add("Módulo da impedância")
+        self.graphs_box.tab("Módulo da impedância").grid(row=0, column=4, pady=5, padx=20)
+        
+        self.graphs_box.add("Tensão")
+        self.graphs_box.tab("Tensão").grid(row=0, column=5, pady=5, padx=20)
+        
+        self.graphs_box.add("Corrente")
+        self.graphs_box.tab("Corrente").grid(row=0, column=6, pady=5, padx=20)
+        
+        # entradas #
 
-        label_sep = QtWidgets.QLabel(self.widget1)
-        label_sep.setObjectName("sep")
-        label_sep.setText("+ j")
-        label_sep.adjustSize()
-        impedance_layout.addWidget(label_sep)
+        self.d_text = ctk.CTkLabel(self, text="\n Distância (em m) ", width=150, font=('Arial Narrow bold', 14))
+        self.d_text.grid(row=1, column=0, columnspan=2, pady=5, padx=10)
+        self.d_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.d_input.grid(row=2, column=0, columnspan=2, pady=5, padx=10)
 
-        line_edit_imag = QtWidgets.QLineEdit(self.widget1)
-        line_edit_imag.setObjectName("prt_imag")
-        impedance_layout.addWidget(line_edit_imag)
-        self.line_edits["prt_imag"] = line_edit_imag
+        self.zo_text = ctk.CTkLabel(self, text="\n Impedância do cabo (em ohm) ", width=150, font=('Arial Narrow bold', 14))
+        self.zo_text.grid(row=3, column=0, columnspan=2, pady=5, padx=10)
+        self.zo_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.zo_input.grid(row=4, column=0, columnspan=2, pady=5, padx=10)
 
-        self.gridLayout.addLayout(impedance_layout, 3, 3, 1, 3)
+        self.C_text = ctk.CTkLabel(self, text="\n Capacitância do cabo (em F/m) ", width=150, font=('Arial Narrow bold', 14))
+        self.C_text.grid(row=5, column=0, columnspan=2, pady=5, padx=10)
+        self.C_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.C_input.grid(row=6, column=0, columnspan=2, pady=5, padx=10)
+
+        self.L_text = ctk.CTkLabel(self, text="\n Indutância do cabo (em H/m) ", width=150, font=('Arial Narrow bold', 14))
+        self.L_text.grid(row=7, column=0, columnspan=2, pady=5, padx=10)
+        self.L_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.L_input.grid(row=8, column=0, columnspan=2, pady=5, padx=10)
+
+        self.f_text = ctk.CTkLabel(self, text="\n Frequência (em Hz)", width=150, font=('Arial Narrow bold', 14))
+        self.f_text.grid(row=9, column=0, columnspan=2, pady=5, padx=10)
+        self.f_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.f_input.grid(row=10, column=0, columnspan=2, pady=5, padx=10)
+
+        self.zl_text = ctk.CTkLabel(self, text="\n Impedância da carga (em ohm) ", width=150, font=('Arial Narrow bold', 14))
+        self.zl_text.grid(row=11, column=0, columnspan=2, pady=5, padx=10)
+        self.zl_input_txt = ctk.CTkLabel(self, text="   + j ", width=75, font=('Arial Narrow bold', 14))
+        self.zl_input_txt.grid(row=12, column=0, columnspan=2, pady=5, padx=10)
+        self.zl_input_real = ctk.CTkEntry(self, width=75, font=('Arial Narrow', 14))
+        self.zl_input_real.grid(row=12, column=0, pady=5, padx=0)
+        self.zl_input_imag = ctk.CTkEntry(self, width=75, font=('Arial Narrow', 14))
+        self.zl_input_imag.grid(row=12, column=1, pady=5, padx=0)
+
+        self.vi_text = ctk.CTkLabel(self, text="\n Tensão sobre a carga (em V) ", width=150, font=('Arial Narrow bold', 14))
+        self.vi_text.grid(row=13, column=0, columnspan=2, pady=5, padx=10)
+        self.vi_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.vi_input.grid(row=14, column=0, columnspan=2, pady=5, padx=10)
+
+        self.pn_text = ctk.CTkLabel(self, text="\n Número de pontos (def 1000) ", width=150, font=('Arial Narrow bold', 14))
+        self.pn_text.grid(row=15, column=0, columnspan=2, pady=5, padx=10)
+        self.pn_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.pn_input.grid(row=16, column=0, columnspan=2, pady=5, padx=10)
+        
+        self.x1_text = ctk.CTkLabel(self, text="\n Ponto de amostragem (x em m) ", width=150, font=('Arial Narrow bold', 14))
+        self.x1_text.grid(row=17, column=0, columnspan=2, pady=5, padx=10)
+        self.x1_input = ctk.CTkEntry(self, width=150, font=('Arial Narrow', 14))
+        self.x1_input.grid(row=18, column=0, columnspan=2, pady=5, padx=10)
+
+        # saídas #
+
+        self.omega_text = ctk.CTkLabel(self, text="\n Ômega (em rad/s) ", width=150, font=('Arial Narrow bold', 14))
+        self.omega_text.grid(row=1, column=3, pady=5, padx=10)
+
+        self.beta_text = ctk.CTkLabel(self, text="\n Beta (em rad/m) ", width=150, font=('Arial Narrow bold', 14))
+        self.beta_text.grid(row=3, column=3, pady=5, padx=10)
+        
+        self.lambdag_text = ctk.CTkLabel(self, text="\n Comp. de onda (em m) ", width=150, font=('Arial Narrow bold', 14))
+        self.lambdag_text.grid(row=5, column=3, pady=5, padx=10)
+
+        self.vp_text = ctk.CTkLabel(self, text="\n Vel. de propagação (em m/s) ", width=150, font=('Arial Narrow bold', 14))
+        self.vp_text.grid(row=7, column=3, pady=5, padx=10)
+
+        self.vg_text = ctk.CTkLabel(self, text="\n Vel. de grupo (em m/s) ", width=150, font=('Arial Narrow bold', 14))
+        self.vg_text.grid(row=9, column=3, pady=5, padx=10)
+
+        self.gammal_text = ctk.CTkLabel(self, text="\n Coef. de reflexão (ads) ", width=150, font=('Arial Narrow bold', 14))
+        self.gammal_text.grid(row=11, column=3, pady=5, padx=10)
+
+        self.tao_text = ctk.CTkLabel(self, text="\n Coef. de refração (ads) ", width=150, font=('Arial Narrow bold', 14))
+        self.tao_text.grid(row=13, column=3, pady=5, padx=10)
+
+        self.swr_text = ctk.CTkLabel(self, text="\n Coef. SWR (ads) ", width=150, font=('Arial Narrow bold', 14))
+        self.swr_text.grid(row=15, column=3, pady=5, padx=10)
+        
+        # botão run #
+
+        self.play = ctk.CTkButton(self, text="Calcular", font=('Arial Narrow bold', 20), command=self.calc).grid(rowspan=18, row=17, column=3, pady=20, padx=10)
+
+    # caixa de diálogo - bugs #
+
+    def error(self, *args, **kwargs):
+        bug = ctk.CTkToplevel(self)
+        bug.geometry = ("400x300")
+        bug.title(" ERRO!")
+        bug.resizable(False, False)
+        
+        warn_txt = ctk.CTkLabel(master = bug, text="\n Insira um número válido para as entradas! \n", width=400, font=('Arial Narrow bold', 14)).pack()
+        check_btn = ctk.CTkButton(master = bug, text="Ok", font=('Arial Narrow bold', 16), command=bug.destroy).pack()
+        trash_txt = ctk.CTkLabel(master = bug, text=" ", width=400, font=('Arial Narrow bold', 14)).pack()
+
+        bug.focus_set()
+
+        return bug
+
+    # programa principal #
+
+    def calc(self):
+
+    # verificador de inputs
+
+        if(self.d_input.get()==""):
+            d = 0
+        else:
+            d = self.d_input.get()
+        d = float(d)
+
+        if(self.zo_input.get()==""):
+            zo = 0
+        else:
+            zo = self.zo_input.get()
+        zo = float(zo)
+
+        if(self.C_input.get()==""):
+            C = 0
+        else:
+            C = self.C_input.get()
+        C = float(C)
+
+        if(self.L_input.get()==""):
+            L = 0
+        else:
+            L = self.L_input.get()
+        L = float(L)
+
+        if(self.f_input.get()==""):
+            f = 0
+        else:
+            f = self.f_input.get()
+        f = float(f)
+
+        if(self.zl_input_real.get()==""):
+            zl_real = 0
+        else:
+            zl_real = self.zl_input_real.get()
+        zl_real = float(zl_real)
+
+        if(self.zl_input_imag.get()==""):
+            zl_imag = 0
+        else:
+            zl_imag = self.zl_input_imag.get()
+        zl_imag = float(zl_imag)
+
+        if(self.vi_input.get()==""):
+            vi = 1
+        else:
+            vi = self.vi_input.get()
+        vi = float(vi)
+
+        if(self.pn_input.get()==""):
+            pn = 1000
+        else:
+            pn = self.pn_input.get()
+        pn = int(pn)
+
+        if(self.x1_input.get()==""):
+            x1 = 0
+        else:
+            x1 = self.x1_input.get()
+        x1 = float(x1)
+
+        zl = complex(zl_real,zl_imag)
+
+        # verificador de bugs #
+
+        if d<0 or zo<0 or C<0 or L<0 or f<=0 or zl_real<0 or vi<=0 or pn<=1 or x1<0:
+            self.bugbug = self.error()
+
+        # constantes de saída #
+
+        omega = 2*np.pi*f
+        self.omega_out = ctk.CTkLabel(self, text=(f'{omega:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.omega_out.grid(row=2, column=3, pady=5, padx=10)
+
+        beta = omega*np.sqrt(L*C)
+        self.beta_out = ctk.CTkLabel(self, text=(f'{beta:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.beta_out.grid(row=4, column=3, pady=5, padx=10)
+
+        lambda_g = 2*np.pi/beta
+        self.lambdag_out = ctk.CTkLabel(self, text=(f'{lambda_g:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.lambdag_out.grid(row=6, column=3, pady=5, padx=10)
+
+        vp = 1/(np.sqrt(L*C))
+        self.vp_out = ctk.CTkLabel(self, text=(f'{vp:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.vp_out.grid(row=8, column=3, pady=5, padx=10)
+
+        vg = vp
+        self.vg_out = ctk.CTkLabel(self, text=(f'{vg:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.vg_out.grid(row=10, column=3, pady=5, padx=10)
+
+        gamma_L = (zl-zo)/(zl+zo)
+        self.gammal_out = ctk.CTkLabel(self, text=(f'{gamma_L:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.gammal_out.grid(row=12, column=3, pady=5, padx=10)
+
+        tao = gamma_L + 1
+        self.tao_out = ctk.CTkLabel(self, text=(f'{tao:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.tao_out.grid(row=14, column=3, pady=5, padx=10)
+
+        SWR = (1+gamma_L)/(1-gamma_L)
+        self.swr_out = ctk.CTkLabel(self, text=(f'{SWR:.2e}'), fg_color="#111", width=150, font=('Arial Narrow bold', 14))
+        self.swr_out.grid(row=16, column=3, pady=5, padx=10)
+
+        # início dos plots #
+
+        dimx = (self.winfo_screenwidth()-450)
+        dimy = (self.winfo_screenheight()-200)
+
+        longx = (0.95*dimx)/100
+        longy = (0.95*dimy)/100
+
+        graph_1 = plt.Figure(figsize=(longx/3,longy/2), dpi=100)
+        graph_1_zoomed = plt.Figure(figsize=(3*longx/4,longy), dpi=100)
+        graph_2 = plt.Figure(figsize=(longx/3,longy/2), dpi=100)
+        graph_2_zoomed = plt.Figure(figsize=(3*longx/4,longy), dpi=100)
+        graph_3 = plt.Figure(figsize=(longx/3,longy/2), dpi=100)
+        graph_3_zoomed = plt.Figure(figsize=(3*longx/4,longy), dpi=100)
+        graph_4 = plt.Figure(figsize=(longx/2,longy/2), dpi=100)
+        graph_4_zoomed = plt.Figure(figsize=(3*longx/4,longy), dpi=100)
+        graph_5 = plt.Figure(figsize=(longx/2,longy/2), dpi=100)
+        graph_5_zoomed = plt.Figure(figsize=(3*longx/4,longy), dpi=100)
+
+        ax1 = graph_1.add_subplot(111)
+        ax1_zoomed = graph_1_zoomed.add_subplot(111)
+        ax2 = graph_2.add_subplot(111)
+        ax2_zoomed = graph_2_zoomed.add_subplot(111)
+        ax3 = graph_3.add_subplot(111)
+        ax3_zoomed = graph_3_zoomed.add_subplot(111)
+        ax4 = graph_4.add_subplot(111)
+        ax4_zoomed = graph_4_zoomed.add_subplot(111)
+        ax5 = graph_5.add_subplot(111)
+        ax5_zoomed = graph_5_zoomed.add_subplot(111)
+
+        dt = np.linspace(0,d,pn)              # distância de 0m até d(m)
+        itens = np.linspace(0,10,100)           # quantidade de ondas a serem plotadas
+
+        zd = zo*((zl+1j*zo*np.tan(beta*dt))/(zo+1j*zl*np.tan(beta*dt)))
+        zdx = zo*((zl+1j*zo*np.tan(beta*x1))/(zo+1j*zl*np.tan(beta*x1)))
+        
+        # plots #
+
+        ax1.plot(dt, np.real(zd), label='Parte Real', color='red')
+        ax1.grid()
+        ax1.set_xlabel('d [m]', labelpad=1)
+        ax1.set_ylabel('Z(d) [ohms]', labelpad=1)
+        ax1.legend(loc='upper right')
+
+        ax1_zoomed.plot(dt, np.real(zd), label='Parte Real', color='red')
+        ax1_zoomed.plot(x1, np.real(zdx), 'ok')
+        ax1_zoomed.grid()
+        ax1_zoomed.set_xlabel('d [m]', labelpad=1)
+        ax1_zoomed.set_ylabel('Z(d) [ohms]', labelpad=1)
+        ax1_zoomed.set_title('\n Parte Real da Impedância ao longo da linha', pad=20)
+        ax1_zoomed.legend(loc='upper right')
+
+        ax2.plot(dt, np.imag(zd), label='Parte Imaginária', color='blue')
+        ax2.grid()
+        ax2.set_xlabel('d [m]', labelpad=1)
+        ax2.set_ylabel('Z(d) [ohms]', labelpad=1)
+        ax2.set_title('\n Impedância ao longo da linha', pad=20)
+        ax2.legend(loc='upper right')
+
+        ax2_zoomed.plot(dt, np.imag(zd), label='Parte Imaginária', color='blue')
+        ax2_zoomed.plot(x1, np.imag(zdx), 'ok')
+        ax2_zoomed.grid()
+        ax2_zoomed.set_xlabel('d [m]', labelpad=1)
+        ax2_zoomed.set_ylabel('Z(d) [ohms]', labelpad=1)
+        ax2_zoomed.set_title('\n Parte Imaginária da Impedância ao longo da linha', pad=20)
+        ax2_zoomed.legend(loc='upper right')
+
+        ax3.plot(dt, np.sqrt(np.real(zd)**2 + np.imag(zd)**2), label='Módulo', color='green')
+        ax3.grid()
+        ax3.set_xlabel('d [m]', labelpad=1)
+        ax3.set_ylabel('|Z(d)| [ohms]', labelpad=1)
+        ax3.legend(loc='upper right')
+
+        ax3_zoomed.plot(dt, np.sqrt(np.real(zd)**2 + np.imag(zd)**2), label='Módulo', color='green')
+        ax3_zoomed.plot(x1, np.sqrt(np.real(zdx)**2 + np.imag(zdx)**2), 'ok')
+        ax3_zoomed.grid()
+        ax3_zoomed.set_xlabel('d [m]', labelpad=1)
+        ax3_zoomed.set_ylabel('|Z(d)| [ohms]', labelpad=1)
+        ax3_zoomed.legend(loc='upper right')
+        ax3_zoomed.set_title('\n Parte Imaginária da Impedância ao longo da linha', pad=20)
 
 
-    def add_button(self):
-        # Adiciona o botão ao layout
-        self.pushButton = QtWidgets.QPushButton(self.widget1)
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton.setText("Calcular")
-        self.gridLayout.addWidget(self.pushButton, 4, 0, 1, 24)
-        self.pushButton.clicked.connect(self.calcular)
+        for t in itens:                         # calculando a amplitude da onda (tensão e corrente) no ponto d
+            v = vi*(np.cos(beta*dt)+gamma_L*np.cos(beta*dt))*np.cos(2*np.pi*t)-vi*(np.sin(beta*dt)-gamma_L*np.sin(beta*dt))*np.sin(2*np.pi*t)
+            ax4.plot(dt,np.real(v),linestyle = 'dotted')
+            ax4_zoomed.plot(dt,np.real(v),linestyle = 'dotted')
+            i = (vi/zo)*np.cos(2*np.pi*t+beta*dt)-(vi/zo)*gamma_L*np.cos(2*np.pi*t-beta*dt)
+            ax5.plot(dt,np.real(i),linestyle = 'dotted')
+            ax5_zoomed.plot(dt,np.real(i),linestyle = 'dotted')
 
-    def retranslateUi(self):
-        # Define os textos dos elementos da interface
-        _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("MainWindow", "Programa de cálculo de ondas - PEP-IFSP"))
+        envoltoria_v = vi*(1+(gamma_L**2)+2*gamma_L*np.cos(2*beta*dt))**(1/2)
+        envoltoria_vx = vi*(1+(gamma_L**2)+2*gamma_L*np.cos(2*beta*x1))**(1/2)
+        ax4.plot(dt,np.real(envoltoria_v), label='envoltória +', linewidth = '3.0')
+        ax4.plot(dt,np.real(-envoltoria_v), label='envoltória -', linewidth = '3.0')
+        ax4_zoomed.plot(dt,np.real(envoltoria_v), label='envoltória +', linewidth = '3.0')
+        ax4_zoomed.plot(dt,np.real(-envoltoria_v), label='envoltória -', linewidth = '3.0')
+        ax4_zoomed.plot(x1, np.real(envoltoria_vx), 'ok', x1, np.real(-envoltoria_vx), 'ok')
 
-    def calcular(self):
-        try:
-            # Recupera os valores dos campos de entrada
-            d = float(self.line_edits["res_d"].text())
-            zo = float(self.line_edits["res_zo"].text())
-            C = float(self.line_edits["res_C"].text())
-            L = float(self.line_edits["res_L"].text())
-            f = float(self.line_edits["res_f"].text())
-            zl = complex(float(self.line_edits["prt_real"].text()), float(self.line_edits["prt_imag"].text()))
-            vi = float(self.line_edits["res_vi"].text())
+        envoltoria_i = (vi/zo)*np.sqrt((1+(gamma_L**2)-2*gamma_L*np.cos(2*beta*dt)))
+        envoltoria_ix = (vi/zo)*np.sqrt((1+(gamma_L**2)-2*gamma_L*np.cos(2*beta*x1)))
+        ax5.plot(dt,np.real(envoltoria_i), label='envoltória +', linewidth = '3.0')
+        ax5.plot(dt,np.real(-envoltoria_i), label='envoltória -', linewidth = '3.0')
+        ax5_zoomed.plot(dt,np.real(envoltoria_i), label='envoltória +', linewidth = '3.0')
+        ax5_zoomed.plot(dt,np.real(-envoltoria_i), label='envoltória -', linewidth = '3.0')
+        ax5_zoomed.plot(x1, np.real(envoltoria_ix), 'ok', x1, np.real(-envoltoria_ix), 'ok')
 
-            # Verifica se o campo 'res_pts' está vazio e define um valor padrão
-            pts_text = self.line_edits["res_pts"].text()
-            if pts_text.strip() == "":
-                pts = 1000
-            else:
-                pts = int(pts_text)
+        ax4.grid()
+        ax4.set_title('Tensão ao longo da linha', pad=20)
+        ax4.set_xlabel('d [m]')
+        ax4.set_ylabel('V(d,t) [V]')
+        ax4.legend(loc='right')
+        ax4_zoomed.grid()
+        ax4_zoomed.set_title('Tensão ao longo da linha', pad=20)
+        ax4_zoomed.set_xlabel('d [m]')
+        ax4_zoomed.set_ylabel('V(d,t) [V]')
+        ax4_zoomed.legend(loc='right')
 
-            # Realiza os cálculos
-            omega = 2 * np.pi * f
-            beta = omega * np.sqrt(L * C)
-            lambda_g = 2 * np.pi / beta
-            vp = 1 / np.sqrt(L * C)
-            vg = vp
-            gamma_L = (zl - zo) / (zl + zo)
-            tao = gamma_L + 1
-            SWR = (1 + gamma_L) / (1 - gamma_L)
-            dt = np.linspace(0, d, pts)
-            itens = np.linspace(0, 10, 100)
-            zd = zo*((zl+1j*zo*np.tan(beta*dt))/(zo+1j*zl*np.tan(beta*dt)))
+        ax5.grid()
+        ax5.set_title('Corrente ao longo da linha', pad=20)
+        ax5.set_xlabel('d [m]')
+        ax5.set_ylabel('I(d,t) [A]')
+        ax5.legend(loc='right')
+        ax5_zoomed.grid()
+        ax5_zoomed.set_title('Corrente ao longo da linha', pad=20)
+        ax5_zoomed.set_xlabel('d [m]')
+        ax5_zoomed.set_ylabel('I(d,t) [A]')
+        ax5_zoomed.legend(loc='right')
 
-            # Verifica se algum dos valores é negativo
-            if any(x < 0 for x in [d, zo, C, L, f, vi, pts]):
-                raise ValueError()
-            
-            # Apresenta os resultados
-            res_text = [
-                omega, beta, lambda_g, vp, vg, gamma_L, tao, SWR
-            ]
+        # Tab "Visão Geral" #
+        
+        graphs_vg_r1 = ctk.CTkFrame(master=self.graphs_box.tab("Visão Geral"), width=dimx, fg_color="#fff")
+        graphs_vg_r1.grid(column=1,row=1, padx=5, pady=5)
+        graphs_vg_r2 = ctk.CTkFrame(master=self.graphs_box.tab("Visão Geral"), width=dimx, fg_color="#fff")
+        graphs_vg_r2.grid(column=1,row=2, padx=5, pady=5)
 
-            res_positions = [
-                (1, 12), (1, 15), (1, 18), (1, 21), (3, 12), (3, 15), (3, 18), (3, 21)
-            ]
+        canva_vg1 = FigureCanvasTkAgg(graph_1, master=graphs_vg_r1)
+        canva_vg1.draw()
+        canva_vg1.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
 
-            for i, (value, pos) in enumerate(zip(res_text, res_positions)):
-                if self.result_labels[i] is None:
-                    label = QtWidgets.QLabel(self.widget1)
-                    label.setObjectName(f"res_label_{i}")
-                    self.gridLayout.addWidget(label, *pos, 1, 3)
-                    self.result_labels[i] = label
-                self.result_labels[i].setText(f'{value:.3e}')
+        canva_vg2 = FigureCanvasTkAgg(graph_2, master=graphs_vg_r1)
+        canva_vg2.draw()
+        canva_vg2.get_tk_widget().grid(column=1,row=0, padx=10, pady=10)
 
-            # Limpa as figuras atuais
-            for figure in self.figures:
-                figure.clear()
+        canva_vg3 = FigureCanvasTkAgg(graph_3, master=graphs_vg_r1)
+        canva_vg3.draw()
+        canva_vg3.get_tk_widget().grid(column=2,row=0, padx=10, pady=10)
 
-            # Cria os subplots e plota os resultados em cada aba
-            ax1 = self.figures[0].add_subplot(111)
-            ax2 = self.figures[1].add_subplot(111)
-            ax3 = self.figures[2].add_subplot(111)
-            ax4 = self.figures[3].add_subplot(111)
-            ax5 = self.figures[4].add_subplot(111)
+        canva_vg4 = FigureCanvasTkAgg(graph_4, master=graphs_vg_r2)
+        canva_vg4.draw()
+        canva_vg4.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
 
-            ax1.plot(dt, np.real(zd), label='Parte Real', color='red')
-            ax1.grid()
-            ax1.set_title('Impedância ao longo da linha')
-            ax1.set_xlabel('$d [m]$')
-            ax1.set_ylabel('$Z (d) [\Omega]$')
-            ax1.legend(loc='upper right')
+        canva_vg5 = FigureCanvasTkAgg(graph_5, master=graphs_vg_r2)
+        canva_vg5.draw()
+        canva_vg5.get_tk_widget().grid(column=1,row=0, padx=10, pady=10)
 
-            ax2.plot(dt, np.imag(zd), label='Parte Imaginária', color='blue')
-            ax2.grid()
-            ax2.set_title('Impedância ao longo da linha')
-            ax2.set_xlabel('$d [m]$')
-            ax2.set_ylabel('$Z (d) [\Omega]$')
-            ax2.legend(loc='upper right')
+        self.graphs_box.set("Visão Geral")
 
-            ax3.plot(dt, np.sqrt(np.real(zd)**2 + np.imag(zd)**2), label='Módulo', color='green')
-            ax3.grid()
-            ax3.set_title('Impedância ao longo da linha')
-            ax3.set_xlabel('$d [m]$')
-            ax3.set_ylabel('$Z (d) [\Omega]$')
-            ax3.legend(loc='upper right')
+        # Tab "Parte real da impedância" #
+        
+        graphs_zd1_c1 = ctk.CTkFrame(master=self.graphs_box.tab("Parte real da impedância"), width=3*dimx/4, height=dimy, fg_color="#fff")
+        graphs_zd1_c1.grid(column=0,row=0, padx=0, pady=5)
+        graphs_zd1_c2 = ctk.CTkFrame(master=self.graphs_box.tab("Parte real da impedância"), width=dimx/4, height=dimy, fg_color="#fff")
+        graphs_zd1_c2.grid(column=1,row=0, padx=0, pady=5)
 
-            for t in itens:                         # calculando a amplitude da onda (tensão e corrente) no ponto d
-                v = vi*(np.cos(beta*dt)+gamma_L*np.cos(beta*dt))*np.cos(2*np.pi*t)-vi*(np.sin(beta*dt)-gamma_L*np.sin(beta*dt))*np.sin(2*np.pi*t)
-                ax4.plot(dt,np.real(v),linestyle = 'dotted')
-                i = (vi/zo)*np.cos(2*np.pi*t+beta*dt)-(vi/zo)*gamma_L*np.cos(2*np.pi*t-beta*dt)
-                ax5.plot(dt,np.real(i),linestyle = 'dotted')
-            
-            envoltoria_v = vi*(1+(gamma_L**2)+2*gamma_L*np.cos(2*beta*dt))**(1/2)
-            ax4.plot(dt,np.real(envoltoria_v), label='envoltória +', linewidth = '3.0')
-            ax4.plot(dt,np.real(-envoltoria_v), label='envoltória -', linewidth = '3.0')
+        canva_zd1 = FigureCanvasTkAgg(graph_1_zoomed, master=graphs_zd1_c1)
+        canva_zd1.draw()
+        canva_zd1.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
 
-            envoltoria_i = (vi/zo)*np.sqrt((1+(gamma_L**2)-2*gamma_L*np.cos(2*beta*dt)))
-            ax5.plot(dt,np.real(envoltoria_i), label='envoltória +', linewidth = '3.0')
-            ax5.plot(dt,np.real(-envoltoria_i), label='envoltória -', linewidth = '3.0')
+        self.zd1_txt2 = ctk.CTkLabel(master=graphs_zd1_c2, text="\n - Valores no ponto de amostragem - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.zd1_txt2.grid(row=1, column=0, pady=0, padx=10)
+        self.zd1_txt2 = ctk.CTkLabel(master=graphs_zd1_c2, text="\n Posição escolhida x [m] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_txt2.grid(row=2, column=0, pady=0, padx=10)
+        self.zd1_out2 = ctk.CTkLabel(master=graphs_zd1_c2, text=(f'{x1:.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_out2.grid(row=3, column=0, pady=0, padx=10)
+        self.zd1_txt2 = ctk.CTkLabel(master=graphs_zd1_c2, text="\n Valor da parte real de Z(x) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_txt2.grid(row=4, column=0, pady=0, padx=10)
+        self.zd1_out2 = ctk.CTkLabel(master=graphs_zd1_c2, text=(f'{np.real(zdx):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_out2.grid(row=5, column=0, pady=0, padx=10)
 
-            ax4.grid()
-            ax4.set_title('Tensão ao longo da linha')
-            ax4.set_xlabel('$d [m]$')
-            ax4.set_ylabel('$v (d,t) [V]$')
-            ax4.legend(loc='right')
+        self.zd1_txt2 = ctk.CTkLabel(master=graphs_zd1_c2, text="\n\n - Valores nos limites - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.zd1_txt2.grid(row=6, column=0, pady=0, padx=10)
+        self.zd1_txt1 = ctk.CTkLabel(master=graphs_zd1_c2, text="\n Valor máximo da parte real de Z(d) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_txt1.grid(row=7, column=0, pady=0, padx=10)
+        self.zd1_out1 = ctk.CTkLabel(master=graphs_zd1_c2, text=(f'{max(np.real(zd)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_out1.grid(row=8, column=0, pady=0, padx=10)
+        self.zd1_txt1 = ctk.CTkLabel(master=graphs_zd1_c2, text="\n Valor mínimo da parte real de Z(d) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_txt1.grid(row=9, column=0, pady=0, padx=10)
+        self.zd1_out1 = ctk.CTkLabel(master=graphs_zd1_c2, text=(f'{min(np.real(zd)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd1_out1.grid(row=10, column=0, pady=0, padx=10)
 
-            ax5.grid()
-            ax5.set_title('Corrente ao longo da linha')
-            ax5.set_xlabel('$d [m]$')
-            ax5.set_ylabel('$i (d,t) [A]$')
-            ax5.legend(loc='right')
+        # Tab "Parte imaginária da impedância" #
 
-            # Adiciona o cursor interativo para cada gráfico
-            for ax in [ax1, ax2, ax3, ax4, ax5]:
-                cursor = mplcursors.cursor(ax, hover=True)
-                @cursor.connect("add")
-                def on_add(sel):
-                    x, y = sel.target
-                    sel.annotation.set(text=f"x: {x:.3e}, y: {y:.3e}", fontsize=10, ha="center")
+        graphs_zd2_c1 = ctk.CTkFrame(master=self.graphs_box.tab("Parte imaginária da impedância"), width=3*dimx/4, height=dimy, fg_color="#fff")
+        graphs_zd2_c1.grid(column=0,row=0, padx=0, pady=5)
+        graphs_zd2_c2 = ctk.CTkFrame(master=self.graphs_box.tab("Parte imaginária da impedância"), width=dimx/4, height=dimy, fg_color="#fff")
+        graphs_zd2_c2.grid(column=1,row=0, padx=0, pady=5)
 
-            # Arruma o layout
-            for figure in self.figures:
-                figure.tight_layout()
-                for ax in figure.axes:
-                    ax.autoscale(enable=True, axis='x', tight=True)
+        canva_zd2 = FigureCanvasTkAgg(graph_2_zoomed, master=graphs_zd2_c1)
+        canva_zd2.draw()
+        canva_zd2.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
 
-            # Atualiza os canvases com as novas figuras
-            for canvas in self.canvases:
-                canvas.draw()
+        self.zd2_txt2 = ctk.CTkLabel(master=graphs_zd2_c2, text="\n - Valores no ponto de amostragem - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.zd2_txt2.grid(row=1, column=0, pady=0, padx=10)
+        self.zd2_txt2 = ctk.CTkLabel(master=graphs_zd2_c2, text="\n Posição escolhida x [m] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_txt2.grid(row=2, column=0, pady=0, padx=10)
+        self.zd2_out2 = ctk.CTkLabel(master=graphs_zd2_c2, text=(f'{x1:.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_out2.grid(row=3, column=0, pady=0, padx=10)
+        self.zd2_txt2 = ctk.CTkLabel(master=graphs_zd2_c2, text="\n Valor da parte imaginária de Z(x) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_txt2.grid(row=4, column=0, pady=0, padx=10)
+        self.zd2_out2 = ctk.CTkLabel(master=graphs_zd2_c2, text=(f'{np.imag(zdx):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_out2.grid(row=5, column=0, pady=0, padx=10)
 
-        except ValueError:
-            # Exibe uma mensagem de erro se algum valor não puder ser convertido para float
-            error_dialog = QErrorMessage()
-            error_dialog.showMessage("Por favor, insira valores válidos em todos os campos.")
-            error_dialog.exec()
+        self.zd2_txt2 = ctk.CTkLabel(master=graphs_zd2_c2, text="\n\n - Valores nos limites - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.zd2_txt2.grid(row=6, column=0, pady=0, padx=10)
+        self.zd2_txt1 = ctk.CTkLabel(master=graphs_zd2_c2, text="\n Valor máximo da parte imaginária de Z(d) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_txt1.grid(row=7, column=0, pady=0, padx=10)
+        self.zd2_out1 = ctk.CTkLabel(master=graphs_zd2_c2, text=(f'{max(np.imag(zd)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_out1.grid(row=8, column=0, pady=0, padx=10)
+        self.zd2_txt1 = ctk.CTkLabel(master=graphs_zd2_c2, text="\n Valor mínimo da parte imaginária de Z(d) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_txt1.grid(row=9, column=0, pady=0, padx=10)
+        self.zd2_out1 = ctk.CTkLabel(master=graphs_zd2_c2, text=(f'{min(np.imag(zd)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd2_out1.grid(row=10, column=0, pady=0, padx=10)
 
-def main():
-    app = QApplication(sys.argv)
-    mostrar = Janela()
-    mostrar.show()
-    sys.exit(app.exec())
+        # Tab "Módulo da impedância" #
 
-if __name__ == '__main__':
-    main()
+        graphs_zd3_c1 = ctk.CTkFrame(master=self.graphs_box.tab("Módulo da impedância"), width=3*dimx/4, height=dimy, fg_color="#fff")
+        graphs_zd3_c1.grid(column=0,row=0, padx=0, pady=5)
+        graphs_zd3_c2 = ctk.CTkFrame(master=self.graphs_box.tab("Módulo da impedância"), width=dimx/4, height=dimy, fg_color="#fff")
+        graphs_zd3_c2.grid(column=1,row=0, padx=0, pady=5)
+
+        canva_zd3 = FigureCanvasTkAgg(graph_3_zoomed, master=graphs_zd3_c1)
+        canva_zd3.draw()
+        canva_zd3.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
+
+        self.zd3_txt2 = ctk.CTkLabel(master=graphs_zd3_c2, text="\n - Valores do ponto de amostragem - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.zd3_txt2.grid(row=1, column=0, pady=0, padx=10)
+        self.zd3_txt2 = ctk.CTkLabel(master=graphs_zd3_c2, text="\n Posição escolhida x [m] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_txt2.grid(row=2, column=0, pady=0, padx=10)
+        self.zd3_out2 = ctk.CTkLabel(master=graphs_zd3_c2, text=(f'{x1:.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_out2.grid(row=3, column=0, pady=0, padx=10)
+        self.zd3_txt2 = ctk.CTkLabel(master=graphs_zd3_c2, text="\n Valor do módulo de Z(x) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_txt2.grid(row=4, column=0, pady=0, padx=10)
+        self.zd3_out2 = ctk.CTkLabel(master=graphs_zd3_c2, text=(f'{np.abs(zdx):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_out2.grid(row=5, column=0, pady=0, padx=10)
+
+        self.zd3_txt2 = ctk.CTkLabel(master=graphs_zd3_c2, text="\n\n - Valores nos limites - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.zd3_txt2.grid(row=6, column=0, pady=0, padx=10)
+        self.zd3_txt1 = ctk.CTkLabel(master=graphs_zd3_c2, text="\n Valor máximo do módulo de Z(d) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_txt1.grid(row=7, column=0, pady=0, padx=10)
+        self.zd3_out1 = ctk.CTkLabel(master=graphs_zd3_c2, text=(f'{max(np.abs(zd)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_out1.grid(row=8, column=0, pady=0, padx=10)
+        self.zd3_txt1 = ctk.CTkLabel(master=graphs_zd3_c2, text="\n Valor mínimo do módulo de Z(d) [ohms] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_txt1.grid(row=9, column=0, pady=0, padx=10)
+        self.zd3_out1 = ctk.CTkLabel(master=graphs_zd3_c2, text=(f'{min(np.abs(zd)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.zd3_out1.grid(row=10, column=0, pady=0, padx=10)
+
+        # Tab "Tensão" #
+
+        graphs_vd0_c1 = ctk.CTkFrame(master=self.graphs_box.tab("Tensão"), width=3*dimx/4, height=dimy, fg_color="#fff")
+        graphs_vd0_c1.grid(column=0,row=0, padx=0, pady=5)
+        graphs_vd0_c2 = ctk.CTkFrame(master=self.graphs_box.tab("Tensão"), width=dimx/4, height=dimy, fg_color="#fff")
+        graphs_vd0_c2.grid(column=1,row=0, padx=0, pady=5)
+
+        canva_vd0 = FigureCanvasTkAgg(graph_4_zoomed, master=graphs_vd0_c1)
+        canva_vd0.draw()
+        canva_vd0.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
+
+        self.vd0_txt2 = ctk.CTkLabel(master=graphs_vd0_c2, text="\n - Valores do ponto de amostragem - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.vd0_txt2.grid(row=1, column=0, pady=0, padx=10)
+        self.vd0_txt2 = ctk.CTkLabel(master=graphs_vd0_c2, text="\n Posição escolhida x [m] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_txt2.grid(row=2, column=0, pady=0, padx=10)
+        self.vd0_out2 = ctk.CTkLabel(master=graphs_vd0_c2, text=(f'{x1:.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_out2.grid(row=3, column=0, pady=0, padx=10)
+        self.vd0_txt2 = ctk.CTkLabel(master=graphs_vd0_c2, text="\n Valor da tensão V(x, t) [V] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_txt2.grid(row=4, column=0, pady=0, padx=10)
+        self.vd0_out2 = ctk.CTkLabel(master=graphs_vd0_c2, text=(f'{np.real(envoltoria_vx):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_out2.grid(row=5, column=0, pady=0, padx=10)
+
+        self.vd0_txt2 = ctk.CTkLabel(master=graphs_vd0_c2, text="\n\n - Valores nos limites - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.vd0_txt2.grid(row=6, column=0, pady=0, padx=10)
+        self.vd0_txt1 = ctk.CTkLabel(master=graphs_vd0_c2, text="\n Valor máximo da tensão V(d, t) [V] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_txt1.grid(row=7, column=0, pady=0, padx=10)
+        self.vd0_out1 = ctk.CTkLabel(master=graphs_vd0_c2, text=(f'{max(np.real(envoltoria_v)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_out1.grid(row=8, column=0, pady=0, padx=10)
+        self.vd0_txt1 = ctk.CTkLabel(master=graphs_vd0_c2, text="\n Valor mínimo da tensão V(d, t) [V] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_txt1.grid(row=9, column=0, pady=0, padx=10)
+        self.vd0_out1 = ctk.CTkLabel(master=graphs_vd0_c2, text=(f'{min(np.real(envoltoria_v)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.vd0_out1.grid(row=10, column=0, pady=0, padx=10)
+
+        # Tab "Corrente" #
+
+        graphs_id0_c1 = ctk.CTkFrame(master=self.graphs_box.tab("Corrente"), width=3*dimx/4, height=dimy, fg_color="#fff")
+        graphs_id0_c1.grid(column=0,row=0, padx=0, pady=5)
+        graphs_id0_c2 = ctk.CTkFrame(master=self.graphs_box.tab("Corrente"), width=dimx/4, height=dimy, fg_color="#fff")
+        graphs_id0_c2.grid(column=1,row=0, padx=0, pady=5)
+
+        canva_id0 = FigureCanvasTkAgg(graph_5_zoomed, master=graphs_id0_c1)
+        canva_id0.draw()
+        canva_id0.get_tk_widget().grid(column=0,row=0, padx=10, pady=10)
+
+        self.id0_txt2 = ctk.CTkLabel(master=graphs_id0_c2, text="\n - Valores do ponto de amostragem - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.id0_txt2.grid(row=1, column=0, pady=0, padx=10)
+        self.id0_txt2 = ctk.CTkLabel(master=graphs_id0_c2, text="\n Posição escolhida x [m] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_txt2.grid(row=2, column=0, pady=0, padx=10)
+        self.id0_out2 = ctk.CTkLabel(master=graphs_id0_c2, text=(f'{x1:.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_out2.grid(row=3, column=0, pady=0, padx=10)
+        self.id0_txt2 = ctk.CTkLabel(master=graphs_id0_c2, text="\n Valor da corrente I(x, t) [A] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_txt2.grid(row=4, column=0, pady=0, padx=10)
+        self.id0_out2 = ctk.CTkLabel(master=graphs_id0_c2, text=(f'{np.real(envoltoria_ix):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_out2.grid(row=5, column=0, pady=0, padx=10)
+
+        self.id0_txt2 = ctk.CTkLabel(master=graphs_id0_c2, text="\n\n - Valores nos limites - ", text_color="#000", font=('Arial Narrow bold', 18))
+        self.id0_txt2.grid(row=6, column=0, pady=0, padx=10)
+        self.id0_txt1 = ctk.CTkLabel(master=graphs_id0_c2, text="\n Valor máximo da corrente I(d, t) [A] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_txt1.grid(row=7, column=0, pady=0, padx=10)
+        self.id0_out1 = ctk.CTkLabel(master=graphs_id0_c2, text=(f'{max(np.real(envoltoria_i)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_out1.grid(row=8, column=0, pady=0, padx=10)
+        self.id0_txt1 = ctk.CTkLabel(master=graphs_id0_c2, text="\n Valor mínimo da corrente I(d, t) [A] ", text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_txt1.grid(row=9, column=0, pady=0, padx=10)
+        self.id0_out1 = ctk.CTkLabel(master=graphs_id0_c2, text=(f'{min(np.real(envoltoria_i)):.2e}'), text_color="#000", font=('Arial Narrow bold', 14))
+        self.id0_out1.grid(row=10, column=0, pady=0, padx=10)
+
+# definição #
+
+wdw = Prog()
+wdw.geometry("{0}x{1}+0+0".format(wdw.winfo_screenwidth(), wdw.winfo_screenheight()))
+wdw.title("Simulador de LTs [OLCL5 - 2024]")
+wdw.mainloop()
