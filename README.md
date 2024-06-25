@@ -28,7 +28,7 @@ cd Projeto-microondas-PEP-IFSP
 Instale os pacotes necessários:
 
 ```bash
-pip install PyQt6 customtkinter NumPy
+pip install customtkinter matplotlib NumPy
 ```
 
 ## Como usar
