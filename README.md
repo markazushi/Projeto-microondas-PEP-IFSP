@@ -55,7 +55,7 @@ python Ondas_TF.py
 ## Estrutura do Código
 
 - `Ondas_TF.py`: Arquivo principal que contém a lógica da aplicação.
-- `Janela`: Classe principal que define a interface gráfica e realiza os cálculos e plotagens.
+- `Prog`: Classe principal que define a interface gráfica e realiza os cálculos e plotagens.
 
 ## Contribuição
 
