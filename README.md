@@ -1,6 +1,6 @@
 # Projeto-microondas-PEP-IFSP
 
-Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP - Instituto Federal de Ciencias e Tecnologia de São Paulo Campus PEP - Presidente Epitacio e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas PyQt6 e Matplotlib para a interface gráfica e visualização de dados.
+Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP-PEP (Instituto Federal de Ciência e Tecnologia de São Paulo - Campus - Presidente Epitácio) e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas _CustomTkinter_ e _PyQt6_ para a interface gráfica, além das biblioteca _NumPy_ e _MatPlotLib_ para os cálculos e gráficos do back-end.
 
 ## Funcionalidades
 
@@ -12,10 +12,10 @@ Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia E
 ## Requisitos
 
 - Python 3.6 ou superior
-- PyQt6
 - Matplotlib
-- Mplcursors
 - NumPy
+- PyQt6 + Mplcursors (para `Main_PyQt.py`)
+- CustomTkinter (para `Main_CTk.py`)
 
 ## Instalação
 
@@ -29,7 +29,11 @@ cd Projeto-microondas-PEP-IFSP
 Instale os pacotes necessários:
 
 ```bash
-pip install PyQt6 matplotlib NumPy mplcursors
+pip install matplotlib NumPy PyQt6 mplcursors
+```
+   ou
+```bash
+pip install matplotlib NumPy customtkinter
 ```
 
 ## Como usar
@@ -37,24 +41,32 @@ pip install PyQt6 matplotlib NumPy mplcursors
 1. Execute o script principal para iniciar a aplicação:
 
 ```bash
-python Main.py
+python Main_PtQt.py
+```
+   ou
+```bash
+python Main_CTk.py
 ```
 
 2. Insira os valores necessários nos campos de entrada:
-    - Capacitância do cabo (F/m)
-    - Indutância do cabo (H/m)
-    - Distância da carga ao ponto (m)
-    - Impedância do cabo (ohms)
-    - Tensão sobre a carga (V)
-    - Impedância da carga (ohms)
-    - Frequência (Hz)
+    - Distância da carga ao ponto (**d** em m)
+    - Impedância do cabo (**Zo** em ohms)
+    - Capacitância do cabo (**C** em F/m)
+    - Indutância do cabo (**L** em H/m)
+    - Frequência da onda (**f** em Hz)
+    - Impedância da carga (**Zl** em ohms)
+    - Tensão sobre a linha (**Vi** em V)
+    - Números de pontos para plotagem (default=1000)
+    - Ponto de amostragem (posição **x** em m)
 
-3. Clique no botão "Calcular" para realizar os cálculos e visualizar os resultados e gráficos.
+3. Clique no botão "Calcular" para realizar os cálculos e poder visualizar resultados e gráficos.
 
 ## Estrutura do Código
 
-- `Main.py`: Arquivo principal que contém a lógica da aplicação.
-- `Janela`: Classe principal que define a interface gráfica e realiza os cálculos e plotagens.
+- `Main_CTk.py`: Arquivo principal que contém a lógica da aplicação aplicada com a biblioteca _CustomTkinter_.
+- `Prog`: Classe principal que define a interface gráfica, realizando os cálculos e plotagens.
+- `Main_CTk.py`: Arquivo principal que contém a lógica da aplicação aplicada com as bibliotecas _PyQt_ e _Mplcursors_.
+- `Janela`: Classe principal que define a interface gráfica, realizando os cálculos e plotagens.
 
 ## Contribuição
 
