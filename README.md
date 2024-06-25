@@ -1,6 +1,6 @@
 # Projeto-microondas-PEP-IFSP
 
-Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP-PEP (Instituto Federal de Ciência e Tecnologia de São Paulo - Campus - Presidente Epitácio) e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas _CustomTkinter_ e _PyQt6_ para a interface gráfica, além das biblioteca _NumPy_ e _MatPlotLib_ para os cálculos e gráficos do back-end.
+Este projeto foi desenvolvido por alunos do curso de Bacharelado em Engenharia Eletrica do IFSP-PEP (Instituto Federal de Ciência e Tecnologia de São Paulo - Campus - Presidente Epitácio) e tem como objetivo realizar cálculos relacionados a ondas em linhas de transmissão de micro-ondas. A aplicação foi construída utilizando Python e as bibliotecas _CustomTkinter_ e _PyQt6_ para as interfaces gráficas, além das biblioteca _NumPy_ e _MatPlotLib_ para os cálculos e gráficos do back-end.
 
 ## Funcionalidades
 
