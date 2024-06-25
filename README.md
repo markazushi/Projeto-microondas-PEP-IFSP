@@ -50,7 +50,7 @@ python Ondas_TF.py
     - Números de pontos para plotagem (_default=1000_)
     - Ponto de amostragem (posição **x** em m)
 
-3. Clique no botão "Calcular" para realizar os cálculos e visualizar os resultados e gráficos.
+3. Clique no botão "Calcular" para realizar os cálculos e poder visualizar resultados e gráficos.
 
 ## Estrutura do Código
 
